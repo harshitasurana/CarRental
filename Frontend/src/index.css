@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import "tailwindcss";
+
+*{
+  font-family: "Outfit", sans-serif;
+}
+
+@theme{
+  --color-primary: #1E3A8A;
+  --color-primary-dull: #3B82F6;
+  --color-light: #F8FAFC;
+  --color-borderColor: #E2E8F0;
+
+}
+
+ @keyframes marqueeScroll {
+        0% {
+            transform: translateX(0%);
+        }
+
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    .marquee-inner {
+        animation: marqueeScroll 25s linear infinite;
+    }
+
+    .marquee-reverse {
+        animation-direction: reverse;
+    }

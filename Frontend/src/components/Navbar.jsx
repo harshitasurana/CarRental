@@ -1,0 +1,64 @@
+import React, { useState } from 'react'
+import { assets, menuLinks } from '../assets/assets'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+const Navbar = ({setShowLogin}) => {
+
+    const location=useLocation()
+    const [open,SetOpen]= useState(false)
+    const navigate=useNavigate()
+
+
+  return (
+   <div className={`flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 text-gray-600 border-b border-borderColor relative transition-all ${location.pathname === '/' ? "bg-light" : "bg-white"}`}>
+
+  <Link to='/'>
+    <img className='h-8' src={assets.logo} alt="logo" />
+  </Link>
+
+  <div className={`max-sm:fixed max-sm:inset-0 max-sm:pt-20 max-sm:h-screen max-sm:w-full max-sm:border-t border-borderColor right-0 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 max-sm:p-4 transition-all duration-300 transform z-50 ${location.pathname === '/' ? "bg-light" : "bg-white"} ${open ? "max-sm:translate-x-0" : "max-sm:translate-x-full"}`}>
+
+    {menuLinks.map((link, index) => (
+      <Link key={index} to={link.path}>
+        {link.name}
+      </Link>
+    ))}
+
+    <div className='hidden lg:flex items-center text-sm gap-2 border border-borderColor px-3 rounded-full max-w-56'>
+      <input
+        type="text"
+        className='py-1.5 w-full bg-transparent outline-none placeholder:text-gray-500'
+        placeholder='Search Products'
+      />
+      <img src={assets.search_icon} alt="search" />
+    </div>
+
+    <div className='flex max-sm:flex-col items-start sm:items-center gap-6'>
+      <button onClick={() => navigate('/owner')} className='cursor-pointer'>
+        Dashboard
+      </button>
+
+      <button
+        onClick={() => setShowLogin(true)}
+        className='cursor-pointer px-12 py-2 bg-primary hover:bg-primary-dull transition-all text-white rounded-lg'
+      >
+        Login
+      </button>
+    </div>
+  </div>
+
+  <button className="sm:hidden fixed right-6 top-5 z-[60]">
+
+    <img
+      className='cursor-pointer'
+      aria-label='Menu'
+      onClick={() => SetOpen(!open)}
+      src={open ? assets.close_icon : assets.menu_icon}
+      alt="menu"
+    />
+  </button>
+</div>
+
+  )
+}
+
+export default Navbar
