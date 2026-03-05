@@ -45,7 +45,7 @@ export const userLogin=async(req,res)=>{
         if(!user){
             return res.json({success:false,message:"User not found"})
         }
-        const isMatch=await bcrypt.compare(password)
+        const isMatch=await bcrypt.compare(password,user.password)
 
         if(!isMatch){
             return res.json({success:false,message:"Invalid credentials"})
@@ -61,3 +61,14 @@ export const userLogin=async(req,res)=>{
         res.json({success:false,message:err.message})
     }
 }
+
+export const getUserData=async(req,res)=>{
+    try{
+        const {user}=req
+        res.json({success:true,user})
+
+    }catch(err){
+        console.log(err.message);
+        res.json({success:false,message:err.message})
+    }
+} 
