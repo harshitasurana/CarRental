@@ -42,7 +42,7 @@ const Testimonial = () => {
   const doubledCards = [...cardsData, ...cardsData];
 
   return (
-    <div className="py-16 bg-white">
+    <div className="py-16 bg-light/50">
 
         <Title title="What Our Customers Say" subTitle="Discover why discerning travelers choose StayVenture for their luxury accommodations around the world." />
 

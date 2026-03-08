@@ -3,12 +3,13 @@
 
 *{
   font-family: "Outfit", sans-serif;
+  
 }
 
 @theme{
-  --color-primary: #1E3A8A;
-  --color-primary-dull: #3B82F6;
-  --color-light: #F8FAFC;
+    --color-primary: #3B82F6;
+  --color-primary-dull:#3B82F6;
+  --color-light: #F3F4F6;
   --color-borderColor: #E2E8F0;
 
 }
