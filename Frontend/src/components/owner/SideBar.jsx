@@ -1,15 +1,29 @@
 import React, { useState } from 'react'
-import { assets, dummyUserData, ownerMenuLinks } from '../../assets/assets'
+import { assets, ownerMenuLinks } from '../../assets/assets'
 import { NavLink, useLocation } from 'react-router-dom'
+import { useAppContext } from '../../context/AppContext'
+import toast from 'react-hot-toast'
 
 const SideBar = () => {
-    const user = dummyUserData
+    const { user, axios, fetchUser } = useAppContext()
     const location = useLocation()
     const [image, setImage] = useState('')
 
     const updateImage = async () => {
-        user.image = URL.createObjectURL(image)
-        setImage('')
+        try {
+            const formData = new FormData()
+            formData.append('image', image)
+            const { data } = await axios.post('/api/owner/update-image', formData)
+            if (data.success) {
+                fetchUser()
+                toast.success(data.message)
+                setImage('')
+            } else {
+                toast.error(data.message)
+            }
+        } catch (err) {
+             toast.error(err.message)
+        }
 
     }
     return (
@@ -26,18 +40,18 @@ max-w-13 md:max-w-60 w-full border-r border-borderColor text-sm'>
                 </label>
             </div>
             {image && (
-                <button className='absolute top-0 right-0 flex p-2 gap-1 bg-primary/10 text-primary cursor-pointer'>Save <img src={assets.check_icon} width={13} alt="" onClick={updateImage}/> </button>
+                <button className='absolute top-0 right-0 flex p-2 gap-1 bg-primary/10 text-primary cursor-pointer'onClick={updateImage}>Save <img src={assets.check_icon} width={13} alt=""  /> </button>
             )}
 
             <p className='mt-2 text-base max-md:hidden'>{user?.name}</p>
 
             <div className='w-full'>
-                {ownerMenuLinks.map((link,index)=>(
-                    <NavLink key={index} to={link.path} className={`w-full relative flex items-center gap2 w-full py-3 pl-4 first:mt-6 ${link.path===location.pathname?'bg-primary/10 text-primary':'text-gray-600'}`}>
-                        <img src={link.path=== location.pathname ? link.coloredIcon : link.icon} alt="car icon" />
+                {ownerMenuLinks.map((link, index) => (
+                    <NavLink key={index} to={link.path} className={`w-full relative flex items-center gap2 w-full py-3 pl-4 first:mt-6 ${link.path === location.pathname ? 'bg-primary/10 text-primary' : 'text-gray-600'}`}>
+                        <img src={link.path === location.pathname ? link.coloredIcon : link.icon} alt="car icon" />
                         <span className='max-md:hidden'>{link.name}</span>
 
-                        <div className={`${link.path===location.pathname&&'bg-primary'} w-1.5 h-8 rounded-l right-0 absolute`}></div>
+                        <div className={`${link.path === location.pathname && 'bg-primary'} w-1.5 h-8 rounded-l right-0 absolute`}></div>
                     </NavLink>
                 ))}
 

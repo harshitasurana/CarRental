@@ -120,7 +120,7 @@ export const getDashboardData = async (req, res) => {
 
         const dashBoardData = {
             totalCars: cars.length,
-            toatlBookings: bookings.length,
+            totalBookings: bookings.length,
             pendingBookings: pendingBooking.length,
             completedBookings: completedBooking.length,
             recentBookings: bookings.slice(0, 3),
