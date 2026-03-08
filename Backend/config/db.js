@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 const connectDb = async () => {
     try {
 
-        await mongoose.connect('mongodb+srv://harshitasurana2005:root@cluster0.rhysitg.mongodb.net/Car-Rental-App');
+        await mongoose.connect(process.env.MONGO_URI);
 
         console.log("Database Connected");
 
