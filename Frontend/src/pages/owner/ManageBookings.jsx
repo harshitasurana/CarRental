@@ -22,6 +22,7 @@ const ManageBookings = () => {
       const {data}= await axios.post('/api/bookings/change-status',{bookingId,status})
       if(data.success){
         toast.success(data.message)
+        fetchOwnerBookings()
       } else{
         toast.error(data.message)
       }
@@ -80,7 +81,7 @@ const ManageBookings = () => {
                 <td className='p-3'>{booking.price} Rs. /day</td>
 
                 <td className='p-3 max-md:hidden'>
-                  <span className='bg-gray-100 px-3 py-1 rounded-full text-xs'>offline</span>
+                  <span className='bg-gray-100 px-3 py-1 rounded-full text-xs'>{booking.status}</span>
                 </td>
 
                 <td className='p-3'>
