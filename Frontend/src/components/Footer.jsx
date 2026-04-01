@@ -12,11 +12,11 @@ const Footer = () => {
         {/* Logo + About */}
         <div className="max-w-sm">
           <Link to="/">
-            <img className="h-8" src={assets.logo} alt="CarRental logo" />
+            <img className="h-14 object-contain" src={assets.logo3} alt="CarRental logo" />
           </Link>
 
           <p className="mt-6 text-sm text-gray-500 leading-relaxed">
-            CarRental makes luxury and comfortable travel simple.  
+            GoDrive makes luxury and comfortable travel simple.  
             Book premium cars for trips, business, or weekends —  
             or earn passive income by listing your own vehicle.
           </p>
