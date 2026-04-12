@@ -1,5 +1,7 @@
 import Booking from "../models/Booking.js"
 import Car from "../models/cars.js"
+import fs from 'fs'
+import imagekit from '../config/imgKit.js'
 
 const checkAvailability = async (car, pickupDate, returnDate) => {
     const booking = await Booking.find({
@@ -40,11 +42,69 @@ export const checkAvailabilityofCar = async (req, res) => {
 export const createBooking = async (req, res) => {
     try {
         const { _id } = req.user
-        const { car, pickupDate, returnDate } = req.body
-        const isAvailable = await checkAvailability(car, pickupDate, returnDate)
-        if (!isAvailable) {
-            res.json({ success: false, message: "Car is not available" })
+
+        // ✅ OLD DATA (kept same but safe)
+        const car = req.body?.car
+        const pickupDate = req.body?.pickupDate
+        const returnDate = req.body?.returnDate
+        const phone = req.body?.phone
+
+        // ✅ NEW FILES
+        const aadharFile = req.files?.aadhar?.[0]
+        const licenseFile = req.files?.license?.[0]
+
+        // ✅ VALIDATION
+        if (!car || !pickupDate || !returnDate) {
+            return res.json({ success: false, message: "Missing booking data" })
         }
+
+        if (!aadharFile || !licenseFile) {
+            return res.json({ success: false, message: "Documents required" })
+        }
+
+        // 🔥 UPLOAD AADHAR
+        const aadharBuffer = fs.readFileSync(aadharFile.path)
+
+        const aadharUpload = await imagekit.upload({
+            file: aadharBuffer,
+            fileName: aadharFile.originalname,
+            folder: '/documents/aadhar'
+        })
+
+        const aadharUrl = imagekit.url({
+            path: aadharUpload.filePath,
+            transformation: [
+                { width: "600" },
+                { quality: 'auto' },
+                { format: 'webp' }
+            ]
+        })
+
+        // 🔥 UPLOAD LICENSE
+        const licenseBuffer = fs.readFileSync(licenseFile.path)
+
+        const licenseUpload = await imagekit.upload({
+            file: licenseBuffer,
+            fileName: licenseFile.originalname,
+            folder: '/documents/license'
+        })
+
+        const licenseUrl = imagekit.url({
+            path: licenseUpload.filePath,
+            transformation: [
+                { width: "600" },
+                { quality: 'auto' },
+                { format: 'webp' }
+            ]
+        })
+
+        // ✅ EXISTING LOGIC (UNCHANGED)
+        const isAvailable = await checkAvailability(car, pickupDate, returnDate)
+
+        if (!isAvailable) {
+            return res.json({ success: false, message: "Car is not available" })
+        }
+
         const carData = await Car.findById(car)
 
         const pick = new Date(pickupDate)
@@ -52,14 +112,28 @@ export const createBooking = async (req, res) => {
         const noOfDays = Math.ceil((returned - pick) / (1000 * 60 * 60 * 24))
 
         const price = carData.pricePerDay * noOfDays
-        await Booking.create({ car, owner: carData.owner, user: _id, pickupDate, returnDate, price })
+
+        // ✅ SAVE WITH NEW DATA
+        await Booking.create({
+            car,
+            owner: carData.owner,
+            user: _id,
+            pickupDate,
+            returnDate,
+            price,
+            phone,
+            aadhar: aadharUrl,
+            license: licenseUrl
+        })
 
         res.json({ success: true, message: "Booking Created" })
+
     } catch (err) {
         console.log(err.message);
         res.json({ success: false, message: err.message })
     }
 }
+
 export const getUserBookings = async (req, res) => {
     try {
         const { _id } = req.user
