@@ -14,6 +14,7 @@ import ManageCars from './pages/owner/ManageCars'
 import Login from './components/Login'
 import {Toaster} from 'react-hot-toast'
 import { useAppContext } from './context/AppContext'
+import Verification from './pages/Verification'
 const App = () => {
   const {showLogin}=useAppContext()
   const isOwnerPath = useLocation().pathname.startsWith('/owner')
@@ -26,6 +27,7 @@ const App = () => {
     <Routes>
       <Route path='/' element={<Home />} />
       <Route path='/car-details/:id'  element={<CarDetails />} />
+      <Route path='/verification/:id' element={<Verification />} />
       <Route path='/cars'  element={<Cars/>} />
       <Route path='/my-bookings'  element={<MyBooking />} />
       <Route path='/owner' element={<Layout />}>

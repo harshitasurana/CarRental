@@ -1,129 +1,159 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { assets, dummyCarData } from '../assets/assets'
+import { assets } from '../assets/assets'
 import Loader from '../components/Loader'
 import { useAppContext } from '../context/AppContext'
 import toast from 'react-hot-toast'
 
 const CarDetails = () => {
   const { id } = useParams()
-  const { cars, axios, pickupDate, setPickupDate, returnDate, setReturnDate } = useAppContext()
+  const { cars, pickupDate, setPickupDate, returnDate, setReturnDate } = useAppContext()
 
   const navigate = useNavigate()
-
   const [car, setCar] = useState(null)
 
-  const handleSubmit = async (e) => {
-
+  // 🔥 UPDATED: redirect to verification page
+  const handleSubmit = (e) => {
     e.preventDefault()
 
-    try {
-      const { data } = await axios.post('/api/bookings/create', { car: id, pickupDate, returnDate })
-      if (data.success) {
-        toast.success(data.message)
-        navigate('/my-bookings')
-      } else {
-        toast.error(data.message)
-      }
-    } catch (err) {
-      toast.error(err.message)
+    // ✅ Validation
+    if (!pickupDate || !returnDate) {
+      return toast.error("Please select both dates")
     }
+
+    if (new Date(returnDate) < new Date(pickupDate)) {
+      return toast.error("Return date must be after pickup date")
+    }
+
+    // 🚀 Redirect instead of booking
+    navigate(`/verification/${id}`, {
+      state: { pickupDate, returnDate }
+    })
   }
 
   useEffect(() => {
     setCar(cars.find(car => car._id === id))
-
-
   }, [cars, id])
-
-
-
 
   return car ? (
     <div className='px-6 md:px-16 lg:px-24 xl:px-32 mt-16 mb-20' >
-      <button onClick={() => navigate(-1)} className='flex items-center gap-2 mb-6 text-gray-500 cursor-pointer'>
+
+      {/* 🔙 Back Button */}
+      <button 
+        onClick={() => navigate(-1)} 
+        className='flex items-center gap-2 mb-6 text-gray-500 cursor-pointer'
+      >
         <img src={assets.arrow_icon} className='rotate-180 opacity-65' alt="" />
         Back to all cars
       </button>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12'>
 
+        {/* 🚗 Car Details */}
         <div className='lg:col-span-2'>
-          <img src={car.image} alt="" className='w-full h-auto md:max-h-100 object-cover rounded-xl mb-6 shadow-md' />
+          <img 
+            src={car.image} 
+            alt="" 
+            className='w-full h-auto md:max-h-100 object-cover rounded-xl mb-6 shadow-md' 
+          />
 
           <div className='space-y-6'>
             <div>
-              <h1 className='text-3xl  font-bold '>
+              <h1 className='text-3xl font-bold'>
                 {car.brand} {car.model}
               </h1>
-              <p className='text-gray-500 text-lg '>
-                {car.category} ° {car.year}
+              <p className='text-gray-500 text-lg'>
+                {car.category} • {car.year}
               </p>
             </div>
 
-            <hr className=' border-borderColor my-6' />
+            <hr className='border-borderColor my-6' />
+
+            {/* 🚘 Features Grid */}
             <div className='grid grid-cols-2 sm:grid-cols-4 gap-4'>
               {[
-                { icon: assets.users_icon, text: `${car.seating_capacity} Seates` },
-                { icon: assets.fuel_icon, text: `${car.fuel_type} Seates` },
-                { icon: assets.car_icon, text: `${car.transmission} Seates` },
-                { icon: assets.location_icon, text: `${car.location} Seates` },
+                { icon: assets.users_icon, text: `${car.seating_capacity} Seats` },
+                { icon: assets.fuel_icon, text: `${car.fuel_type}` },
+                { icon: assets.car_icon, text: `${car.transmission}` },
+                { icon: assets.location_icon, text: `${car.location}` },
               ].map(({ icon, text }) => (
                 <div key={text} className='flex flex-col items-center bg-light p-4 rounded-lg'>
-                  <img src={icon} alt="" className='h-5 mb-2' />{text}
+                  <img src={icon} alt="" className='h-5 mb-2' />
+                  {text}
                 </div>
               ))}
-
             </div>
 
+            {/* 📄 Description */}
             <div>
               <h1 className='text-xl mb-3 font-medium'>Description</h1>
               <p className='text-gray-500'>{car.description}</p>
-
             </div>
 
-            <div >
+            {/* ⭐ Extra Features */}
+            <div>
               <p className='text-xl mb-3 font-medium'>Features</p>
-              <ul>{
-                ["360 Camera", "Bluetooth", "GPS", "Heated Seats", "Rear View Mirror"].map((item) => (
+              <ul>
+                {["360 Camera", "Bluetooth", "GPS", "Heated Seats", "Rear View Mirror"].map((item) => (
                   <li key={item} className='flex items-center text-gray-500'>
                     <img src={assets.check_icon} alt="" className='h-4 mr-2' />
                     {item}
                   </li>
-                ))
-              }</ul>
+                ))}
+              </ul>
             </div>
-
-
-
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} action="" className='shadow-lg h-max sticky top-18 rounded-xl p-6 space-y-6 text-gray-500'>
-          <p className='flex items-center justify-between text-2xl text-gar800 font-semibold '>{car.pricePerDay}Rs.<span className='text-base text-gray-400 font-normal'>per day </span></p>
+        {/* 📅 Booking Form */}
+        <form 
+          onSubmit={handleSubmit} 
+          className='shadow-lg h-max sticky top-18 rounded-xl p-6 space-y-6 text-gray-500'
+        >
+          <p className='flex items-center justify-between text-2xl font-semibold'>
+            {car.pricePerDay} Rs.
+            <span className='text-base text-gray-400 font-normal'>/day</span>
+          </p>
+
           <hr className='border-borderColor my-6' />
 
+          {/* 📅 Pickup Date */}
           <div className='flex flex-col gap-2'>
             <label htmlFor="pickup-date">Pickup Date</label>
-            <input value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} type="date" className='border-borderColor px-3 py2 rounded-lg' required id='pickup-date' min={new Date().toISOString().split('T')[0]} />
+            <input
+              value={pickupDate}
+              onChange={(e) => setPickupDate(e.target.value)}
+              type="date"
+              className='border px-3 py-2 rounded-lg'
+              required
+              id='pickup-date'
+              min={new Date().toISOString().split('T')[0]}
+            />
           </div>
+
+          {/* 📅 Return Date */}
           <div className='flex flex-col gap-2'>
             <label htmlFor="return-date">Return Date</label>
             <input
-              value={returnDate} onChange={(e) => setReturnDate(e.target.value)} type="date" className='border-borderColor px-3 py2 rounded-lg' required id='return-date' />
+              value={returnDate}
+              onChange={(e) => setReturnDate(e.target.value)}
+              type="date"
+              className='border px-3 py-2 rounded-lg'
+              required
+              id='return-date'
+            />
           </div>
 
-          <button className='w-full bg-primary hover:bg-primary-dull transition-all py-3 font-medium text-white rounded-xl cursor-pointer'>Book Now</button>
-          <p className='text-center text-sm'>No credit card required to reserve</p>
+          {/* 🚀 Button */}
+          <button className='w-full bg-primary hover:bg-primary-dull transition-all py-3 font-medium text-white rounded-xl'>
+            Proceed to Verification
+          </button>
 
-
+          <p className='text-center text-sm'>
+            Documents required before booking
+          </p>
         </form>
       </div>
-
-
-
-
-
     </div>
   ) : <Loader />
 }

@@ -83,6 +83,39 @@ export const toggleCarAvailability = async (req, res) => {
     }
 }
 
+export const updateUserName = async (req, res) => {
+    try {
+        const { name } = req.body
+
+        if (!name || name.trim().length < 2) {
+            return res.json({
+                success: false,
+                message: "Name must be at least 2 characters"
+            })
+        }
+
+        const { _id } = req.user   // ✅ FIXED
+
+        const user = await User.findByIdAndUpdate(
+            _id,
+            { name },
+            { new: true }
+        )
+
+        res.json({
+            success: true,
+            message: "Name updated successfully",
+            user
+        })
+
+    } catch (err) {
+        res.json({
+            success: false,
+            message: err.message
+        })
+    }
+}
+
 export const deleteCar = async (req, res) => {
     try {
         const { _id } = req.user

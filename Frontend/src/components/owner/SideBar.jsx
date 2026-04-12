@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { assets, ownerMenuLinks } from '../../assets/assets'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useAppContext } from '../../context/AppContext'
@@ -8,6 +8,13 @@ const SideBar = () => {
     const { user, axios, fetchUser } = useAppContext()
     const location = useLocation()
     const [image, setImage] = useState('')
+    const [name, setName] = useState(user?.name || '')
+    const [isEditingName, setIsEditingName] = useState(false)
+    
+
+    useEffect(() => {
+        setName(user?.name || '')
+    }, [user])
 
     const updateImage = async () => {
         try {
@@ -24,7 +31,24 @@ const SideBar = () => {
         } catch (err) {
              toast.error(err.message)
         }
+        
 
+    }
+
+    const updateName = async () => {
+        try {
+            const { data } = await axios.post('/api/owner/update-name', { name })
+
+            if (data.success) {
+                fetchUser()
+                toast.success(data.message)
+                setIsEditingName(false)
+            } else {
+                toast.error(data.message)
+            }
+        } catch (err) {
+            toast.error(err.message)
+        }
     }
     return (
         <div className='relative min-h-screen md:flex flex-col items-center pt-8
@@ -43,7 +67,31 @@ max-w-13 md:max-w-60 w-full border-r border-borderColor text-sm'>
                 <button className='absolute top-0 right-0 flex p-2 gap-1 bg-primary/10 text-primary cursor-pointer'onClick={updateImage}>Save <img src={assets.check_icon} width={13} alt=""  /> </button>
             )}
 
-            <p className='mt-2 text-base max-md:hidden'>{user?.name}</p>
+            <div className='mt-2 text-base max-md:hidden text-center'>
+                {isEditingName ? (
+                    <div className='flex flex-col items-center gap-1'>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className='border px-2 py-1 rounded text-sm'
+                        />
+                        <button
+                            onClick={updateName}
+                            className='text-primary text-xs'
+                        >
+                            Save
+                        </button>
+                    </div>
+                ) : (
+                    <p
+                        onClick={() => setIsEditingName(true)}
+                        className='cursor-pointer'
+                    >
+                        {user?.name}
+                    </p>
+                )}
+            </div>
 
             <div className='w-full'>
                 {ownerMenuLinks.map((link, index) => (

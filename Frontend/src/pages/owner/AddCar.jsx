@@ -109,6 +109,7 @@ booking, including pricing, availability, and car specifications. "/>
                             <option value="Sedan">Sedan</option>
                             <option value="SUV">SUV</option>
                             <option value="Van">Van</option>
+                            <option value="Hatchback">Hatchback</option>
                         </select>
                     </div>
                 </div>
